@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('bornes', function (Blueprint $table) {
             $table->id();
             $table->string('nom');
+            $table->string('localisation');
             $table->enum('type_connecteur', ['Type1', 'Type2']);
             $table->float('puissance_kw');
             $table->enum('statut', ['disponible', 'occupee', 'maintenance'])->default('disponible');
