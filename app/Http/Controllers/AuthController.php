@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Http\Requests\RegisterRequest;
+use App\Http\Requests\LoginRequest;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
@@ -24,5 +26,19 @@ class AuthController extends Controller
         ], 201);
     }
 
-    
+    public function login(LoginRequest $request)
+    {
+        if (!Auth::attempt($request->only('email', 'password'))) {
+            return response()->json([
+                'message' => 'Identifiants incorrects'
+            ], 401);
+        }
+
+        $user = Auth::user();
+
+        return response()->json([
+            'token' => $user->createToken('auth_token')->plainTextToken,
+            'user'  => $user,
+        ]);
+    }
 }
