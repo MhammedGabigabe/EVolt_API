@@ -9,6 +9,7 @@ use App\Http\Controllers\AuthController;
 // })->middleware('auth:sanctum');
 
 Route::Post ('/register',[AuthController::class, 'register']);
+Route::Post('/login', [AuthController::class, 'login']);
 
 
 
