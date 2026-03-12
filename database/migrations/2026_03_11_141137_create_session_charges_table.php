@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('session_charges', function (Blueprint $table) {
             $table->id();
-            $table-foreignId('reservation_id')->constrained('reservations')->onDelete('cascade');
+            $table->foreignId('reservation_id')->constrained('reservations')->onDelete('cascade');
             $table->dateTime('debut_session');
             $table->dateTime('fin_session')->nullable();
             $table->float('energie_delivree')->nullable();
