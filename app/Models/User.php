@@ -11,7 +11,7 @@ use App\Models\User;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, HasApiTokens ;
 
     protected $fillable = [
         'nom',
