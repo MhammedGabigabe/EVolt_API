@@ -3,13 +3,16 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-
-// Route::get('/user', function (Request $request) {
-//     return $request->user();
-// })->middleware('auth:sanctum');
+use App\Http\Controllers\BorneController;
 
 Route::Post ('/register',[AuthController::class, 'register']);
 Route::Post('/login', [AuthController::class, 'login']);
 
+Route::middleware('auth:sanctum')->group(function () {   
+    Route::get('/user', function (Request $request) {
+        return $request->user();
+    });
+    Route::apiResource('bornes', BorneController::class);
+});
 
 
