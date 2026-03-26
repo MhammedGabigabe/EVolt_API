@@ -41,7 +41,9 @@ class BorneController extends Controller
      */
     public function update(UpdateBorneRequest $request, Borne $borne)
     {
+        $borne->update($request->validated());
 
+        return response()->json($borne);
     }
 
     /**
