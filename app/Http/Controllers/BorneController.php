@@ -64,4 +64,17 @@ class BorneController extends Controller
         ]);
     }
 
+    public function search(Request $request)
+    {
+        $request->validate([
+            'localisation' => 'required|string'
+        ]);
+
+        $bornes = Borne::where('localisation', 'like', '%' . $request->localisation . '%')
+            ->where('statut', 'disponible')
+            ->select('id', 'nom', 'localisation', 'type_connecteur', 'puissance_kw', 'statut')
+            ->get();
+
+        return response()->json(['data' => $bornes]);
+    }
 }
