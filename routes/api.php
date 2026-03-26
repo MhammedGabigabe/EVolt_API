@@ -12,6 +12,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', function (Request $request) {
         return $request->user();
     });
+    Route::get('/bornes/search', [BorneController::class, 'search']);
     Route::apiResource('bornes', BorneController::class);
 });
 
