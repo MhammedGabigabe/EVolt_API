@@ -15,7 +15,7 @@ class BorneController extends Controller
      */
     public function index()
     {
-        
+        return response()->json(Borne::all());
     }
 
     /**
