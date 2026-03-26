@@ -6,6 +6,7 @@ use App\Models\Borne;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreBorneRequest;
 use App\Http\Requests\UpdateBorneRequest;
+use Illuminate\Http\Request;
 
 class BorneController extends Controller
 {
@@ -14,7 +15,7 @@ class BorneController extends Controller
      */
     public function index()
     {
-        //
+        
     }
 
     /**
@@ -22,7 +23,9 @@ class BorneController extends Controller
      */
     public function store(StoreBorneRequest $request)
     {
-        //
+        $borne = Borne::create($request->validated());
+
+        return response()->json($borne, 201);
     }
 
     /**
@@ -30,7 +33,7 @@ class BorneController extends Controller
      */
     public function show(Borne $borne)
     {
-        //
+       
     }
 
     /**
@@ -38,7 +41,7 @@ class BorneController extends Controller
      */
     public function update(UpdateBorneRequest $request, Borne $borne)
     {
-        //
+
     }
 
     /**
@@ -46,6 +49,7 @@ class BorneController extends Controller
      */
     public function destroy(Borne $borne)
     {
-        //
+
     }
+
 }
