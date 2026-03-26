@@ -77,7 +77,47 @@ class ReservationController extends Controller
      */
     public function update(UpdateReservationRequest $request, Reservation $reservation)
     {
-        
+        $user = auth()->user();
+
+        if ($reservation->user_id !== $user->id) {
+            return response()->json(['message' => 'Accès interdit'], 403);
+        }
+
+        $dateDebut = $request->date_debut 
+            ? \Carbon\Carbon::parse($request->date_debut)
+            : $reservation->date_debut;
+
+        $duree = $request->duree_minutes ?? $reservation->duree_minutes;
+
+        $dateFin = $dateDebut->copy()->addMinutes($duree);
+
+        $conflit = Reservation::where('borne_id', $reservation->borne_id)
+            ->where('id', '!=', $reservation->id) // exclure elle-même
+            ->whereIn('statut', ['en_attente','active'])
+            ->where(function($query) use ($dateDebut, $dateFin) {
+                $query->whereBetween('date_debut', [$dateDebut, $dateFin])
+                    ->orWhereBetween('date_fin', [$dateDebut, $dateFin])
+                    ->orWhere(function($q) use ($dateDebut, $dateFin){
+                        $q->where('date_debut','<=',$dateDebut)
+                            ->where('date_fin','>=',$dateFin);
+                    });
+            })
+            ->exists();
+
+        if($conflit){
+            return response()->json([
+                'message' => 'Conflit avec une autre réservation'
+            ], 409);
+        }
+
+        $reservation->update([
+            'date_debut' => $dateDebut,
+            'duree_minutes' => $duree,
+            'date_fin' => $dateFin,
+        ]);
+
+        return response()->json($reservation);
+
     }
 
     /**
