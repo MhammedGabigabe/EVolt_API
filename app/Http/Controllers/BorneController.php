@@ -33,7 +33,7 @@ class BorneController extends Controller
      */
     public function show(Borne $borne)
     {
-       
+       return response()->json($borne);
     }
 
     /**
