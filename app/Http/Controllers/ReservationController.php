@@ -6,6 +6,9 @@ use App\Models\Reservation;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreReservationRequest;
 use App\Http\Requests\UpdateReservationRequest;
+use App\Models\Borne;
+use Carbon\Carbon;
+
 
 class ReservationController extends Controller
 {
@@ -22,8 +25,44 @@ class ReservationController extends Controller
      */
     public function store(StoreReservationRequest $request)
     {
-        //
+        $user = auth()->user();
+        $borne = Borne::findOrFail($request->borne_id);
+
+        $dateDebut = Carbon::parse($request->date_debut);
+        $dateFin = $dateDebut->copy()->addMinutes($request->duree_minutes);
+
+        $conflit = Reservation::where('borne_id', $borne->id)
+            ->whereIn('statut', ['en_attente','active'])
+            ->where(function($query) use ($dateDebut, $dateFin) {
+                $query->whereBetween('date_debut', [$dateDebut, $dateFin])
+                      ->orWhereBetween('date_fin', [$dateDebut, $dateFin])
+                      ->orWhere(function($q) use ($dateDebut, $dateFin){
+                          $q->where('date_debut','<=',$dateDebut)
+                            ->where('date_fin','>=',$dateFin);
+                      });
+            })
+            ->exists();
+
+        if($conflit){
+            return response()->json([
+                'message' => 'La borne est déjà réservée à ce créneau.'
+            ], 409);
+        }
+
+        $reservation = Reservation::create([
+            'user_id' => $user->id,
+            'borne_id' => $borne->id,
+            'date_debut' => $dateDebut,
+            'duree_minutes' => $request->duree_minutes,
+            'date_fin' => $dateFin,
+            'statut' => 'en_attente'
+        ]);
+
+        $borne->update(['statut' => 'occupee']);
+
+        return response()->json($reservation, 201);
     }
+    
 
     /**
      * Display the specified resource.
@@ -38,7 +77,7 @@ class ReservationController extends Controller
      */
     public function update(UpdateReservationRequest $request, Reservation $reservation)
     {
-        //
+        
     }
 
     /**
@@ -46,6 +85,6 @@ class ReservationController extends Controller
      */
     public function destroy(Reservation $reservation)
     {
-        //
+        
     }
 }
