@@ -14,6 +14,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
     Route::get('/bornes/search', [BorneController::class, 'search']);
     Route::apiResource('bornes', BorneController::class);
+    Route::post('/reservations', [ReservationController::class, 'store']);
 });
 
 
