@@ -51,7 +51,17 @@ class BorneController extends Controller
      */
     public function destroy(Borne $borne)
     {
+        if (auth()->user()->role !== 'admin') {
+            return response()->json([
+                'message' => 'Accès refusé : seulement un administrateur peut supprimer une borne.'
+            ], 403);
+        }
 
+        $borne->delete();
+
+        return response()->json([
+            'message' => 'Borne supprimée'
+        ]);
     }
 
 }
