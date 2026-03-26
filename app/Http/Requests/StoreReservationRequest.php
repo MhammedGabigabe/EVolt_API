@@ -11,7 +11,7 @@ class StoreReservationRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return auth()->check();
     }
 
     /**
@@ -22,7 +22,21 @@ class StoreReservationRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'borne_id' => 'required|exists:bornes,id',
+            'date_debut' => 'required|date|after_or_equal:now',
+            'duree_minutes' => 'required|integer|min:15',
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'borne_id.required' => 'La borne est obligatoire',
+            'borne_id.exists' => 'Cette borne n\'existe pas',
+            'date_debut.required' => 'L\'heure de début est obligatoire',
+            'date_debut.after_or_equal' => 'La date de début doit être aujourd\'hui ou plus tard',
+            'duree_minutes.required' => 'La durée est obligatoire',
+            'duree_minutes.min' => 'La durée minimale est de 15 minutes',
         ];
     }
 }
