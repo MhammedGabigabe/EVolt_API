@@ -11,7 +11,7 @@ class StoreBorneRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return auth()->user() && auth()->user()->role === 'admin';
     }
 
     /**
@@ -22,7 +22,20 @@ class StoreBorneRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'nom' => 'required|string|max:255',
+            'localisation' => 'required|string',
+            'type_connecteur' => 'required|in:Type1,Type2',
+            'puissance_kw' => 'required|numeric|min:1',
+        ];
+    }
+
+    public function messages():array
+    {
+        return [
+            'nom.required' => 'nom est obligatoire',
+            'localisation.required' => "localisation est obligatoire",
+            'type_connecteur.required' => 'type de connecteur est obligatoire',
+            'puissance_kw.required' => 'puissance est obligatoire',
         ];
     }
 }
