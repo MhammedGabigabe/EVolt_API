@@ -14,10 +14,13 @@ class AuthController extends Controller
 {
     public function register(RegisterRequest $request)
     {
+        $isFirstUser = User::count() === 0;
+
         $user = User::create([
             'nom'      => $request->nom,
             'email'    => $request->email,
             'password' => Hash::make($request->password),
+            'role'     => $isFirstUser ? 'admin' : 'user',
         ]);
 
         return response()->json([
