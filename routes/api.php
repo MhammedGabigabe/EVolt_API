@@ -6,6 +6,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BorneController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\SessionChargeController;
+use App\Http\Controllers\StatsController;
 
 Route::Post ('/register',[AuthController::class, 'register']);
 Route::Post('/login', [AuthController::class, 'login']);
@@ -22,6 +23,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/my-sessions', [SessionChargeController::class, 'mySessions']);
     Route::post('/sessions/start/{reservation}', [SessionChargeController::class, 'startSession']);
     Route::post('/sessions/end/{session}', [SessionChargeController::class, 'endSession']);
+    Route::get('/admin/bornes/stats', [StatsController::class, 'bornes']);
 });
 
 
