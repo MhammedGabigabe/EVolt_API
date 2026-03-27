@@ -125,6 +125,19 @@ class ReservationController extends Controller
      */
     public function destroy(Reservation $reservation)
     {
-        
+        $user = auth()->user();
+
+        if ($reservation->user_id !== $user->id) {
+            return response()->json(['message' => 'Accès interdit'], 403);
+        }
+
+        $reservation->update([
+            'statut' => 'annulee'
+        ]);
+
+        return response()->json([
+            'message' => 'Réservation annulée'
+        ]);
+
     }
 }
