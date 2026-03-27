@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BorneController;
 use App\Http\Controllers\ReservationController;
-
+use App\Http\Controllers\SessionChargeController;
 
 Route::Post ('/register',[AuthController::class, 'register']);
 Route::Post('/login', [AuthController::class, 'login']);
@@ -19,6 +19,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/reservations', [ReservationController::class, 'store']);
     Route::put('/reservations/{reservation}', [ReservationController::class, 'update']);
     Route::delete('/reservations/{reservation}', [ReservationController::class, 'destroy']);
+    Route::get('/my-sessions', [SessionChargeController::class, 'mySessions']);
 });
 
 
