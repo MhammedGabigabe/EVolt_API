@@ -4,48 +4,57 @@ namespace App\Http\Controllers;
 
 use App\Models\SessionCharge;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreSessionChargeRequest;
-use App\Http\Requests\UpdateSessionChargeRequest;
+use Carbon\Carbon;
 
 class SessionChargeController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function mySessions()
     {
-        //
+        $user = auth()->user();
+
+        $sessions = SessionCharge::whereHas('reservation', function($query) use ($user) {
+            $query->where('user_id', $user->id);
+        })
+        ->with('reservation.borne')
+        ->get();
+
+        $actuelles = $sessions->filter(function($session) {
+            return is_null($session->fin_session);
+        })->values();
+
+        $passees = $sessions->filter(function($session) {
+            return !is_null($session->fin_session);
+        })->values();
+
+        return response()->json([
+            'actuelles' => $actuelles->map(fn($s) => $this->formatSession($s)),
+            'passees' => $passees->map(fn($s) => $this->formatSession($s)),
+        ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StoreSessionChargeRequest $request)
+    private function formatSession($session)
     {
-        //
-    }
+        $borne = $session->reservation->borne;
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(SessionCharge $sessionCharge)
-    {
-        //
-    }
+        $debut = Carbon::parse($session->debut_session);
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdateSessionChargeRequest $request, SessionCharge $sessionCharge)
-    {
-        //
-    }
+        $fin = $session->fin_session
+            ? Carbon::parse($session->fin_session)
+            : now();
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(SessionCharge $sessionCharge)
-    {
-        //
+        $dureeMinutes = $debut->diffInMinutes($fin);
+        $dureeHeures = $dureeMinutes / 60;
+
+        $energie = $borne->puissance_kw * $dureeHeures;
+
+        return [
+            'id' => $session->id,
+            'borne' => $borne->nom,
+            'localisation' => $borne->localisation,
+            'debut' => $session->debut_session,
+            'fin' => $session->fin_session,
+            'energie delivree' => round($energie, 2),
+            'statut' => is_null($session->fin_session) ? 'en cours' : 'terminée'
+        ];
     }
 }
