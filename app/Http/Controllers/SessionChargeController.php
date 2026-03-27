@@ -71,14 +71,14 @@ class SessionChargeController extends Controller
     private function formatSession($session)
     {
         $borne = $session->reservation->borne;
-
+        $dureeHeures = Carbon::parse($session->debut_session)->diffInMinutes($session->fin_session) / 60;
         return [
             'id' => $session->id,
             'borne' => $borne->nom,
             'localisation' => $borne->localisation,
             'debut' => $session->debut_session,
             'fin' => $session->fin_session,
-            'energie delivree' => $session->energie_delivree,
+            'energie delivree' => $session->reservation->borne->puissance_kw * $dureeHeures,
             'statut' => is_null($session->fin_session) ? 'en cours' : 'terminée'
         ];
     }
