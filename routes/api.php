@@ -4,6 +4,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BorneController;
+use App\Http\Controllers\ReservationController;
+
 
 Route::Post ('/register',[AuthController::class, 'register']);
 Route::Post('/login', [AuthController::class, 'login']);
@@ -15,6 +17,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/bornes/search', [BorneController::class, 'search']);
     Route::apiResource('bornes', BorneController::class);
     Route::post('/reservations', [ReservationController::class, 'store']);
+    Route::put('/reservations/{reservation}', [ReservationController::class, 'update']);
+    Route::delete('/reservations/{reservation}', [ReservationController::class, 'destroy']);
 });
 
 
