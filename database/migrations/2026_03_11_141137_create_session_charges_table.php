@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('reservation_id')->constrained('reservations')->onDelete('cascade');
             $table->dateTime('debut_session');
             $table->dateTime('fin_session')->nullable();
-            $table->float('energie_delivree')->nullable();
+            $table->float('energie_delivree')->nullable()->default(0);
             $table->timestamps();
         });
     }
