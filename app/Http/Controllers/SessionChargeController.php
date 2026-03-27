@@ -10,8 +10,6 @@ use Illuminate\Support\Facades\DB;
 
 class SessionChargeController extends Controller
 {
-
-
     public function startSession($reservationId)
     {
         DB::beginTransaction();
@@ -85,4 +83,32 @@ class SessionChargeController extends Controller
         ];
     }
 
+    public function endSession($sessionId)
+    {
+        DB::beginTransaction();
+
+        try{
+
+            $session = SessionCharge::findOrFail($sessionId);
+            $session->fin_session = now();
+            $dureeHeures = Carbon::parse($session->debut_session)->diffInMinutes($session->fin_session) / 60;
+            $session->energie_delivree = $session->reservation->borne->puissance_kw * $dureeHeures;
+
+            $session->save();
+            $reservation = Reservation::where('id', $session->reservation_id);
+
+            $reservation->update([
+                'statut' => 'terminee'
+            ]);
+
+            DB::commit();
+            return response()->json($session);
+        }catch(Exception $e){
+            DB::rollback();
+            return response()->json([
+                'message' => 'Erreur lors de la fin de la session',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 }
