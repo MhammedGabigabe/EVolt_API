@@ -20,6 +20,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/reservations/{reservation}', [ReservationController::class, 'update']);
     Route::delete('/reservations/{reservation}', [ReservationController::class, 'destroy']);
     Route::get('/my-sessions', [SessionChargeController::class, 'mySessions']);
+    Route::post('/sessions/start/{reservation}', [SessionChargeController::class, 'startSession']);
 });
 
 
