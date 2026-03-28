@@ -1,59 +1,198 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# ⚡ EVolt API
+
+> REST API Laravel pour la gestion intelligente des bornes de recharge pour véhicules électriques.
+
+---
+
+## 📋 Table des matières
+
+- [À propos](#-à-propos)
+- [Fonctionnalités](#-fonctionnalités)
+- [Stack technique](#-stack-technique)
+- [Prérequis](#-prérequis)
+- [Installation](#-installation)
+- [Configuration](#-configuration)
+- [Structure de la base de données](#-structure-de-la-base-de-données)
+- [Endpoints de l'API](#-endpoints-de-lapi)
+- [Authentification](#-authentification)
+- [Tests](#-tests)
+- [Documentation Postman / Swagger](#-documentation-postman--swagger)
+- [Contribuer](#-contribuer)
+- [Licence](#-licence)
+
+---
+
+## 🚀 À propos
+
+**EVolt API** est une API RESTful développée avec Laravel permettant de gérer un réseau de bornes de recharge pour véhicules électriques. Elle offre aux utilisateurs la possibilité de rechercher des bornes disponibles, de réserver des créneaux de recharge et de suivre leurs sessions en temps réel. Les administrateurs disposent d'outils complets pour gérer le parc de bornes et consulter des statistiques détaillées.
+
+---
+
+## ✨ Fonctionnalités
+
+### 👤 Utilisateur
+- 🔒 **Authentification** via Laravel Sanctum (inscription, connexion, déconnexion)
+- ⚡ **Recherche** de bornes disponibles avec filtres (connecteur, puissance, disponibilité en temps réel)
+- 📅 **Réservation** d'une borne pour une période définie (heure de début + durée estimée)
+- 🔄 **Modification** d'une réservation existante (heure, durée)
+- ❌ **Annulation** d'une réservation
+- 📊 **Historique** des sessions de recharge (passées et en cours)
+
+### 🛡️ Administrateur
+- 🔌 **Gestion des bornes** : ajout, modification, suppression
+- ⚙️ **Configuration** du type de connecteur et de la puissance (kW) par borne
+- 🔍 **Statistiques** : taux d'occupation, énergie délivrée, sessions actives
+
+---
+
+## 🛠️ Stack technique
+
+| Composant        | Technologie              |
+|------------------|--------------------------|
+| Framework        | Laravel 11.x             |
+| Language         | PHP 8.2+                 |
+| Authentification | Laravel Sanctum          |
+| Base de données  | PostgreSQL               |
+| Tests            | PHPUnit / Pest           |
+| Documentation    | Postman                  |
+| Versioning       | Git + GitHub             |
+
+---
+
+## 📦 Prérequis
+
+Avant de commencer, assurez-vous d'avoir installé :
+
+- PHP >= 8.2
+- Composer >= 2.x
+- MySQL >= 8.0 ou PostgreSQL >= 15
+- Node.js >= 18.x (optionnel, pour les assets)
+- Git
+
+---
+
+## ⚙️ Installation
+
+### 1. Cloner le dépôt
+
+```bash
+git clone https://github.com/MhammedGabigabe/EVolt_API.git
+cd EVolt_API
+```
+
+### 2. Installer les dépendances PHP
+
+```bash
+composer install
+```
+
+### 3. Copier et configurer le fichier d'environnement
+
+```bash
+cp .env.example .env
+php artisan key:generate
+```
+
+### 4. Configurer la base de données
+
+Éditez le fichier `.env` :
+
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=evolt_db
+DB_USERNAME=root
+DB_PASSWORD=votre_mot_de_passe
+```
+
+### 5. Exécuter les migrations et les seeders
+
+```bash
+php artisan migrate --seed
+```
+
+### 6. Lancer le serveur de développement
+
+```bash
+php artisan serve
+```
+
+L'API sera disponible sur : `http://localhost:8000`
+
+---
+
+## 🔧 Configuration
+
+### Variables d'environnement importantes
+
+```env
+# Application
+APP_NAME=EVoltAPI
+APP_ENV=local
+APP_DEBUG=true
+APP_URL=http://localhost:8000
+
+# Sanctum
+SANCTUM_STATEFUL_DOMAINS=localhost
+
+# Géolocalisation (rayon de recherche par défaut en km)
+SEARCH_DEFAULT_RADIUS=10
+```
+
+---
+
+## 📡 Endpoints de l'API
+
+Base URL : `http://localhost:8000/api`
+
+### 🔐 Authentification
+
+| Méthode | Endpoint             | Description              | Auth requise |
+|---------|----------------------|--------------------------|:------------:|
+| POST    | `/auth/register`     | Inscription              | ❌           |
+| POST    | `/auth/login`        | Connexion                | ❌           |
+| POST    | `/auth/logout`       | Déconnexion              | ✅           |
+| GET     | `/auth/me`           | Profil utilisateur       | ✅           |
+
+### ⚡ Bornes de recharge
+
+| Méthode | Endpoint                  | Description                              | Auth requise | Rôle    |
+|---------|---------------------------|------------------------------------------|:------------:|---------|
+| GET     | `/stations`               | Recherche par zone géographique          | ✅           | User    |
+| GET     | `/stations/{id}`          | Détail d'une borne                       | ✅           | User    |
+| POST    | `/admin/stations`         | Ajouter une borne                        | ✅           | Admin   |
+| PUT     | `/admin/stations/{id}`    | Modifier une borne                       | ✅           | Admin   |
+| DELETE  | `/admin/stations/{id}`    | Supprimer une borne                      | ✅           | Admin   |
+
+**Paramètres de recherche (`GET /stations`) :**
+
+```
+?latitude=33.5731&longitude=-7.5898&radius=10&connector_type=CCS&min_power=50
+```
+
+### 📅 Réservations
+
+| Méthode | Endpoint                      | Description                    | Auth requise |
+|---------|-------------------------------|--------------------------------|:------------:|
+| GET     | `/reservations`               | Mes réservations               | ✅           |
+| POST    | `/reservations`               | Créer une réservation          | ✅           |
+| GET     | `/reservations/{id}`          | Détail d'une réservation       | ✅           |
+| PUT     | `/reservations/{id}`          | Modifier une réservation       | ✅           |
+| DELETE  | `/reservations/{id}/cancel`   | Annuler une réservation        | ✅           |
+
+## 👥 Auteurs
+
+- **Votre GABIGABE** – [@votre-github](https://github.com/MhammedGabigabe)
+
+---
+
+## 📜 Licence
+
+Ce projet est sous licence **MIT**. Voir le fichier [LICENSE](LICENSE) pour plus de détails.
+
+---
 
 <p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+  Fait avec ❤️ et ⚡ pour un avenir plus vert
 </p>
-
-## About Laravel
-
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
-
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
-
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
-
-## Learning Laravel
-
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
-
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-## Laravel Sponsors
-
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
-
-### Premium Partners
-
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
