@@ -183,7 +183,7 @@ Base URL : `http://localhost:8000/api`
 
 ## 👥 Auteurs
 
-- **Votre GABIGABE** – [@votre-github](https://github.com/MhammedGabigabe)
+- **Votre GABIGABE** – [Mhammed-Gabigabe](https://github.com/MhammedGabigabe)
 
 ---
 
