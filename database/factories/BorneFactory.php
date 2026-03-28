@@ -17,7 +17,10 @@ class BorneFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'nom' => fake()->name(),
+            'localisation' => fake()->city(),
+            'type_connecteur' => fake()->randomElement(['Type1', 'Type2']),
+            'puissance_kw' => fake()->numberBetween(3, 50),
         ];
     }
 }
